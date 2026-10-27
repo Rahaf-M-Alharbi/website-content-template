@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>قالب كتابة الموقع</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: a real website, top to bottom, where every block is a labelled writing slot instead of content. */
+  :root {
+    --bg: #F2F5F6;
+    --surface: #FFFFFF;
+    --ink: #15222A;
+    --muted: #55666F;
+    --line: #C9D4D9;
+    --accent: #0E6B6B;
+    --accent-ink: #FFFFFF;
+    --tint: #E2F0EF;
+    --warn: #8A3B12;
+    --warn-tint: #F8EAE0;
+    --font: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F171B; --surface: #172329; --ink: #E5EDF0; --muted: #97A9B2; --line: #2C3E47;
+      --accent: #5EC6C1; --accent-ink: #0C1A1B; --tint: #17302F; --warn: #F0A878; --warn-tint: #2E2118;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F171B; --surface: #172329; --ink: #E5EDF0; --muted: #97A9B2; --line: #2C3E47;
+    --accent: #5EC6C1; --accent-ink: #0C1A1B; --tint: #17302F; --warn: #F0A878; --warn-tint: #2E2118;
+    color-scheme: dark;
+  }
+
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font); font-size: 16px; line-height: 1.75;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 64px;
+  }
+  .wrap { max-width: 1040px; margin-inline: auto; display: flex; flex-direction: column; gap: 40px; }
+  h1, h2, h3, p, ul { margin: 0; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.35; }
+  ul { padding-inline-start: 1.2em; }
+
+  /* intro */
+  .intro { display: grid; gap: 24px; }
+  .intro h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; }
+  .intro .lead { color: var(--muted); max-width: 62ch; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; font-size: .9rem; color: var(--muted); }
+  .legend .f { padding: 8px 14px; min-width: 0; }
+  .brief { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .brief > div { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 20px; min-width: 0; }
+  .brief h2 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .brief ul { display: grid; gap: 4px; font-size: .95rem; }
+  .brief ol { margin: 0; padding-inline-start: 1.3em; display: grid; gap: 4px; font-size: .95rem; }
+
+  /* a section = reading notes on top, the page block below */
+  .sec { display: grid; gap: 12px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .sec-head .n { font-size: .85rem; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 4px; padding: 0 10px; }
+  .sec-head h2 { font-size: 1.35rem; font-weight: 700; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .note { font-size: .92rem; padding: 12px 16px; border-radius: 4px; background: var(--tint); min-width: 0; }
+  .note b { display: block; font-weight: 600; margin-bottom: 2px; }
+  .note.avoid { background: var(--warn-tint); }
+  .note.avoid b { color: var(--warn); }
+  .page { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: clamp(16px, 3vw, 32px); display: grid; gap: 20px; }
+
+  /* writing slots */
+  .f {
+    border: 1.5px dashed var(--accent); border-radius: 4px; padding: 12px 16px;
+    display: grid; gap: 4px; align-content: start; min-width: 0; background: transparent;
+  }
+  .f .top { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .f .t { font-weight: 600; color: var(--accent); font-size: .95rem; }
+  .f .l { font-size: .8rem; color: var(--muted); background: var(--tint); border-radius: 3px; padding: 0 8px; }
+  .f p { font-size: .9rem; color: var(--muted); line-height: 1.7; }
+  .f.big { padding-block: 22px; }
+  .f.big .t { font-size: 1.2rem; }
+  .f.pill { border-radius: 999px; padding: 6px 18px; width: fit-content; }
+  .f.pill p { display: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: start; }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .col { display: grid; gap: 12px; align-content: start; min-width: 0; border: 1px solid var(--line); border-radius: 4px; padding: 16px; }
+  .col > h3 { font-size: .85rem; font-weight: 600; color: var(--muted); }
+  .repeat { font-size: .85rem; color: var(--muted); }
+  .repeat b { color: var(--ink); }
+
+  /* extra pages */
+  .pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .pages .col h3 { color: var(--ink); font-size: 1.05rem; }
+  .pages ul { font-size: .92rem; color: var(--muted); display: grid; gap: 4px; }
+
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="intro">
+    <h1>قالب كتابة الموقع</h1>
+    <p class="lead">هذا هيكل الموقع كما سيظهر للزائر، من أعلى الصفحة إلى أسفلها. لا يحتوي على نص حقيقي. كل مربع منقط يشرح ما يُكتب في هذا المكان وحجمه. اكتبوا النص الحقيقي لكل مربع بالترتيب.</p>
+    <div class="legend">
+      <span>كيف تقرؤون المربعات:</span>
+      <div class="f"><div class="top"><span class="t">اسم الحقل</span><span class="l">الحد الأقصى</span></div><p>شرح ما تكتبونه هنا.</p></div>
+      <span>مربعات ملونة فوق كل قسم: لماذا القسم موجود، وما يجب تجنبه.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section class="sec" id="s1">
+    <div class="sec-head"><span class="n">القسم 1</span><h2>أول الصفحة</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>هو أول ما يراه الزائر. يجب أن يفهم منه في خمس ثوانٍ ما الذي نقدمه.</div>
+      <div class="note avoid"><b>تجنبوا</b>شعارات جميلة لا تقول ما نفعله. الكلمات الصعبة والمصطلحات المتخصصة.</div>
+    </div>
+    <div class="page">
+      <div class="f big"><div class="top"><span class="t">العنوان الرئيسي</span><span class="l">حتى 10 كلمات</span></div><p>يقول ماذا نفعل وما الفائدة للعميل.</p></div>
+      <div class="f"><div class="top"><span class="t">السطر التوضيحي</span><span class="l">حتى 25 كلمة</span></div><p>يشرح لمن نعمل، أو كيف نعمل.</p></div>
+      <div class="row">
+        <div class="f pill"><div class="top"><span class="t">الزر الرئيسي</span><span class="l">2 إلى 3 كلمات</span></div><p>يدعو الزائر إلى التواصل معنا.</p></div>
+        <div class="f pill"><div class="top"><span class="t">الزر الثانوي</span><span class="l">2 إلى 3 كلمات</span></div><p>يدعوه إلى مشاهدة أعمالنا.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="s2">
+    <div class="sec-head"><span class="n">القسم 2</span><h2>المشكلة والحل</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يجعل الزائر يشعر أننا نفهم وضعه. نعرض المشكلات التي يعيشها، ثم نقول كيف نحلّها.</div>
+      <div class="note avoid"><b>تجنبوا</b>مشكلات عامة مثل «الوقت ثمين». الفقرات الطويلة. تكرار ما سيُقال في قسم الخدمات.</div>
+    </div>
+    <div class="page">
+      <div class="f big"><div class="top"><span class="t">العنوان</span><span class="l">سطر واحد</span></div><p>يصف مشكلة العميل كما يراها هو.</p></div>
+      <div class="grid g3">
+        <div class="f"><div class="top"><span class="t">المشكلة الأولى</span><span class="l">سطر واحد</span></div><p>موقف حقيقي يمر به صاحب العمل.</p></div>
+        <div class="f"><div class="top"><span class="t">المشكلة الثانية</span><span class="l">سطر واحد</span></div><p>موقف حقيقي مختلف عن الأول.</p></div>
+        <div class="f"><div class="top"><span class="t">المشكلة الثالثة</span><span class="l">سطر واحد</span></div><p>موقف حقيقي مختلف عن الأولين.</p></div>
+      </div>
+      <div class="f"><div class="top"><span class="t">جملة الانتقال</span><span class="l">جملة واحدة</span></div><p>تنقل القارئ من المشكلة إلى حلّنا.</p></div>
+      <div class="grid g3">
+        <div class="f"><div class="top"><span class="t">الفائدة الأولى</span><span class="l">سطر واحد</span></div><p>تقول ما الذي سيتحسن للعميل.</p></div>
+        <div class="f"><div class="top"><span class="t">الفائدة الثانية</span><span class="l">سطر واحد</span></div><p>تقول ما الذي سيتحسن للعميل.</p></div>
+        <div class="f"><div class="top"><span class="t">الفائدة الثالثة</span><span class="l">سطر واحد</span></div><p>تقول ما الذي سيتحسن للعميل.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="s3">
+    <div class="sec-head"><span class="n">القسم 3</span><h2>الخدمات</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يشرح للزائر ما سيحصل عليه منا.</div>
+      <div class="note avoid"><b>تجنبوا</b>أسماء البرامج والأدوات. صياغة متشابهة في الخدمات الثلاث.</div>
+    </div>
+    <div class="page">
+      <p class="repeat">اكتبوا الحقول نفسها <b>ثلاث مرات</b>: التصميم، ثم الفيديو والمقاطع القصيرة، ثم الكتابة الإعلانية.</p>
+      <div class="grid g3">
+        <div class="col">
+          <h3>الخدمة (1 من 3)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخدمة</span><span class="l">كلمتان إلى أربع</span></div></div>
+          <div class="f"><div class="top"><span class="t">جملة الفائدة</span><span class="l">حتى 12 كلمة</span></div><p>تقول ما يحصل عليه العميل، لا ما نقوم به.</p></div>
+          <div class="f"><div class="top"><span class="t">ثلاث نقاط</span><span class="l">نقطة = سطر</span></div><p>ما تشمله الخدمة.</p></div>
+          <div class="f pill"><div class="top"><span class="t">عنوان الرابط</span><span class="l">2 إلى 3 كلمات</span></div></div>
+        </div>
+        <div class="col">
+          <h3>الخدمة (2 من 3)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخدمة</span><span class="l">كلمتان إلى أربع</span></div></div>
+          <div class="f"><div class="top"><span class="t">جملة الفائدة</span><span class="l">حتى 12 كلمة</span></div><p>تقول ما يحصل عليه العميل، لا ما نقوم به.</p></div>
+          <div class="f"><div class="top"><span class="t">ثلاث نقاط</span><span class="l">نقطة = سطر</span></div><p>ما تشمله الخدمة.</p></div>
+          <div class="f pill"><div class="top"><span class="t">عنوان الرابط</span><span class="l">2 إلى 3 كلمات</span></div></div>
+        </div>
+        <div class="col">
+          <h3>الخدمة (3 من 3)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخدمة</span><span class="l">كلمتان إلى أربع</span></div></div>
+          <div class="f"><div class="top"><span class="t">جملة الفائدة</span><span class="l">حتى 12 كلمة</span></div><p>تقول ما يحصل عليه العميل، لا ما نقوم به.</p></div>
+          <div class="f"><div class="top"><span class="t">ثلاث نقاط</span><span class="l">نقطة = سطر</span></div><p>ما تشمله الخدمة.</p></div>
+          <div class="f pill"><div class="top"><span class="t">عنوان الرابط</span><span class="l">2 إلى 3 كلمات</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="sec" id="s4">
+    <div class="sec-head"><span class="n">القسم 4</span><h2>الأعمال المختارة</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>هو أقوى دليل على جودتنا. الزائر يصدق ما يراه أكثر مما يقرؤه.</div>
+      <div class="note avoid"><b>تجنبوا</b>أرقامًا أو نتائج لم تحدث فعلًا. أعمالًا لم يوافق العميل على نشرها.</div>
+    </div>
+    <div class="page">
+      <div class="f"><div class="top"><span class="t">عنوان القسم</span><span class="l">سطر واحد</span></div></div>
+      <p class="repeat">اكتبوا الحقول الثلاثة لكل عمل، <b>من 6 إلى 9 أعمال</b>.</p>
+      <div class="grid g3">
+        <div class="col">
+          <h3>العمل (يتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم العميل</span></div><p>فقط إذا وافق على ذكره.</p></div>
+          <div class="f"><div class="top"><span class="t">عنوان العمل</span><span class="l">كلمات قليلة</span></div></div>
+          <div class="f"><div class="top"><span class="t">سطر النتيجة</span><span class="l">سطر واحد</span></div><p>استخدموا رقمًا حقيقيًا إن وُجد، مثل عدد المشاهدات أو المبيعات.</p></div>
+        </div>
+        <div class="col">
+          <h3>العمل (يتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم العميل</span></div><p>فقط إذا وافق على ذكره.</p></div>
+          <div class="f"><div class="top"><span class="t">عنوان العمل</span><span class="l">كلمات قليلة</span></div></div>
+          <div class="f"><div class="top"><span class="t">سطر النتيجة</span><span class="l">سطر واحد</span></div><p>استخدموا رقمًا حقيقيًا إن وُجد.</p></div>
+        </div>
+        <div class="col">
+          <h3>العمل (يتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم العميل</span></div><p>فقط إذا وافق على ذكره.</p></div>
+          <div class="f"><div class="top"><span class="t">عنوان العمل</span><span class="l">كلمات قليلة</span></div></div>
+          <div class="f"><div class="top"><span class="t">سطر النتيجة</span><span class="l">سطر واحد</span></div><p>استخدموا رقمًا حقيقيًا إن وُجد.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="sec" id="s5">
+    <div class="sec-head"><span class="n">القسم 5</span><h2>طريقة العمل</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يقنع الزائر بأن البدء معنا سهل وواضح.</div>
+      <div class="note avoid"><b>تجنبوا</b>أكثر من أربع خطوات. كلمات نستخدمها داخل الفريق فقط ولا يعرفها العميل.</div>
+    </div>
+    <div class="page">
+      <div class="f"><div class="top"><span class="t">عنوان القسم</span><span class="l">سطر واحد</span></div></div>
+      <p class="repeat">اكتبوا الحقلين لكل خطوة، <b>أربع خطوات فقط</b>، بالترتيب الذي يحدث فعلًا.</p>
+      <div class="grid g4">
+        <div class="col"><h3>الخطوة الأولى</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخطوة</span><span class="l">كلمة واحدة</span></div></div>
+          <div class="f"><div class="top"><span class="t">الشرح</span><span class="l">سطر واحد</span></div><p>ماذا يحدث، ومن يقوم به: نحن أم العميل.</p></div></div>
+        <div class="col"><h3>الخطوة الثانية</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخطوة</span><span class="l">كلمة واحدة</span></div></div>
+          <div class="f"><div class="top"><span class="t">الشرح</span><span class="l">سطر واحد</span></div><p>ماذا يحدث، ومن يقوم به.</p></div></div>
+        <div class="col"><h3>الخطوة الثالثة</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخطوة</span><span class="l">كلمة واحدة</span></div></div>
+          <div class="f"><div class="top"><span class="t">الشرح</span><span class="l">سطر واحد</span></div><p>ماذا يحدث، ومن يقوم به.</p></div></div>
+        <div class="col"><h3>الخطوة الرابعة</h3>
+          <div class="f"><div class="top"><span class="t">اسم الخطوة</span><span class="l">كلمة واحدة</span></div></div>
+          <div class="f"><div class="top"><span class="t">الشرح</span><span class="l">سطر واحد</span></div><p>ماذا يحدث، ومن يقوم به.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="sec" id="s6">
+    <div class="sec-head"><span class="n">القسم 6</span><h2>الباقات</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يعرض للزائر الخيارات المتاحة بوضوح، ليعرف ما يناسبه ويختار بسهولة.</div>
+      <div class="note avoid"><b>تجنبوا</b>وصفًا غامضًا لما تشمله الباقة. تشابه الباقات حتى لا يعرف الزائر الفرق بينها.</div>
+    </div>
+    <div class="page">
+      <p class="repeat">اكتبوا الحقول لكل باقة، <b>من باقتين إلى ثلاث</b>.</p>
+      <div class="grid g3">
+        <div class="col"><h3>الباقة (تتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الباقة</span></div></div>
+          <div class="f"><div class="top"><span class="t">لمن تناسب</span><span class="l">سطر واحد</span></div></div>
+          <div class="f"><div class="top"><span class="t">ما تشمله</span><span class="l">3 إلى 5 نقاط</span></div></div></div>
+        <div class="col"><h3>الباقة (تتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الباقة</span></div></div>
+          <div class="f"><div class="top"><span class="t">لمن تناسب</span><span class="l">سطر واحد</span></div></div>
+          <div class="f"><div class="top"><span class="t">ما تشمله</span><span class="l">3 إلى 5 نقاط</span></div></div></div>
+        <div class="col"><h3>الباقة (تتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">اسم الباقة</span></div></div>
+          <div class="f"><div class="top"><span class="t">لمن تناسب</span><span class="l">سطر واحد</span></div></div>
+          <div class="f"><div class="top"><span class="t">ما تشمله</span><span class="l">3 إلى 5 نقاط</span></div></div></div>
+      </div>    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="sec" id="s7">
+    <div class="sec-head"><span class="n">القسم 7</span><h2>آراء العملاء</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يثق الزائر بقصص العملاء الحقيقية أكثر مما يثق بكلامنا نحن. كل قصة قصيرة تقول: ماذا احتاج العميل، وماذا فعلنا، وماذا حدث.</div>
+      <div class="note avoid"><b>تجنبوا</b>تفاصيل أو نتائج لم يوافق العميل على نشرها. مديحًا عامًا مثل «خدمة ممتازة». اختلاق النتيجة: إن لم تتوفر نتيجة حقيقية، اكتفوا بالحاجة وما فعلناه.</div>
+    </div>
+    <div class="page">
+      <p class="repeat">اكتبوا القصة بثلاثة أجزاء لكل عميل، <b>من 2 إلى 4 عملاء</b>. الجزء الثالث يُكتب فقط إذا توفرت نتيجة حقيقية.</p>
+      <div class="grid g2">
+        <div class="col"><h3>الرأي (يتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">1. ما الذي احتاجه العميل</span><span class="l">جملة إلى جملتين</span></div><p>مشكلته أو حاجته قبل أن يتعامل معنا.</p></div>
+          <div class="f"><div class="top"><span class="t">2. ما فعلناه</span><span class="l">جملة إلى جملتين</span></div><p>ماذا نفذنا له بالتحديد.</p></div>
+          <div class="f"><div class="top"><span class="t">3. النتيجة</span><span class="l">جملة واحدة</span></div><p>ما الذي تغير عنده، برقم حقيقي إن وُجد.</p></div>
+          <div class="row">
+            <div class="f"><div class="top"><span class="t">اسم العميل</span></div></div>
+            <div class="f"><div class="top"><span class="t">المنصب</span></div></div>
+            <div class="f"><div class="top"><span class="t">اسم الشركة</span></div></div>
+          </div></div>
+        <div class="col"><h3>الرأي (يتكرر)</h3>
+          <div class="f"><div class="top"><span class="t">1. ما الذي احتاجه العميل</span><span class="l">جملة إلى جملتين</span></div><p>مشكلته أو حاجته قبل أن يتعامل معنا.</p></div>
+          <div class="f"><div class="top"><span class="t">2. ما فعلناه</span><span class="l">جملة إلى جملتين</span></div><p>ماذا نفذنا له بالتحديد.</p></div>
+          <div class="f"><div class="top"><span class="t">3. النتيجة</span><span class="l">جملة واحدة</span></div><p>ما الذي تغير عنده، برقم حقيقي إن وُجد.</p></div>
+          <div class="row">
+            <div class="f"><div class="top"><span class="t">اسم العميل</span></div></div>
+            <div class="f"><div class="top"><span class="t">المنصب</span></div></div>
+            <div class="f"><div class="top"><span class="t">اسم الشركة</span></div></div>
+          </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="sec" id="s8">
+    <div class="sec-head"><span class="n">القسم 8</span><h2>الأسئلة الشائعة</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يزيل الشكوك الأخيرة قبل أن يقرر الزائر التواصل معنا.</div>
+      <div class="note avoid"><b>تجنبوا</b>إجابات تتهرب من السؤال.</div>
+    </div>
+    <div class="page">
+      <p class="repeat">اكتبوا <b>من 6 إلى 8 أسئلة</b>. اكتبوا كل سؤال بكلمات العميل نفسه، وأجيبوا في جملة إلى ثلاث جمل.</p>
+      <div class="grid g2">
+        <div class="f"><div class="top"><span class="t">سؤال وإجابة (يتكرر)</span><span class="l">1 إلى 3 جمل للإجابة</span></div><p>يجب أن تغطي الأسئلة المواضيع الآتية:</p>
+          <ul style="color:var(--muted);font-size:.9rem">
+            <li>مع من نعمل</li>
+            <li>مدة التسليم</li>
+            <li>عدد جولات التعديل</li>
+            <li>لمن تعود ملكية الملفات</li>
+          </ul></div>
+        <div class="f"><div class="top"><span class="t">سؤال وإجابة (يتكرر)</span><span class="l">1 إلى 3 جمل للإجابة</span></div><p>وتغطي أيضًا:</p>
+          <ul style="color:var(--muted);font-size:.9rem">
+            <li>هل نقدم التصميم والفيديو والنصوص معًا</li>
+            <li>هل ننشر المحتوى نيابة عن العميل</li>
+            <li>كيف نتواصل أثناء العمل</li>
+            <li>طريقة الدفع</li>
+          </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="sec" id="s9">
+    <div class="sec-head"><span class="n">القسم 9</span><h2>الدعوة إلى التواصل (آخر الصفحة)</h2></div>
+    <div class="notes">
+      <div class="note"><b>لماذا هذا القسم؟</b>يخبر الزائر كيف يبدأ معنا، ويجعل الخطوة سهلة.</div>
+      <div class="note avoid"><b>تجنبوا</b>الضغط على الزائر، أو الاستعجال غير الحقيقي مثل «العرض ينتهي اليوم».</div>
+    </div>
+    <div class="page">
+      <div class="f big"><div class="top"><span class="t">العنوان</span><span class="l">سطر واحد</span></div><p>يذكر هدفًا يريده العميل أو نتيجة يريد الوصول إليها.</p></div>
+      <div class="f"><div class="top"><span class="t">السطر الداعم</span><span class="l">سطر واحد</span></div><p>ماذا يحدث بعد أن يتواصل، وكم ننتظر للرد.</p></div>
+      <div class="f pill"><div class="top"><span class="t">عنوان الزر</span><span class="l">2 إلى 3 كلمات</span></div></div>
+    </div>
+  </section>
+
+  <!-- extra pages -->
+  <section class="sec" id="extra">
+    <div class="sec-head"><span class="n">إضافي</span><h2>الصفحات الإضافية</h2></div>
+    <div class="notes">
+      <div class="note"><b>ملاحظة</b>تُكتب بعد الصفحة الرئيسية. تتبع قواعد الكتابة نفسها.</div>
+    </div>
+    <div class="pages">
+      <div class="col"><h3>صفحة تفاصيل الخدمة (صفحة لكل خدمة)</h3>
+        <ul>
+          <li>مقدمة قصيرة: لمن تناسب الخدمة</li>
+          <li>ما تشمله الخدمة</li>
+          <li>مراحل العمل باختصار</li>
+          <li>دعوة إلى التواصل</li>
+        </ul></div>
+      <div class="col"><h3>صفحة دراسة الحالة</h3>
+        <ul>
+          <li>العنوان</li>
+          <li>التحدي: ماذا كان العميل يحتاج (من سطرين إلى ثلاثة)</li>
+          <li>ما فعلناه</li>
+          <li>النتيجة: أرقام، مع بيان كيف قسناها</li>
+        </ul></div>
+      <div class="col"><h3>صفحة من نحن</h3>
+        <ul>
+          <li>لماذا بدأنا: قصة قصيرة</li>
+          <li>الفريق: الأسماء والأدوار</li>
+          <li>ثلاث قيم نؤمن بها، كل قيمة في سطر</li>
+          <li>دعوة إلى التواصل</li>
+        </ul></div>
+      <div class="col"><h3>صفحة التواصل</h3>
+        <ul>
+          <li>مقدمة: ماذا يحدث بعد أن يرسل العميل طلبه</li>
+          <li>وعد بمدة الرد</li>
+        </ul></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
